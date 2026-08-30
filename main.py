@@ -18,7 +18,7 @@ def run_server():
 
 threading.Thread(target=run_server, daemon=True).start()
 
-TOKEN = "8271721680:AAGtBR4gtIIdH1dNdjconBEedT67NDLK6ck"
+TOKEN = "8882509587:AAGtBR4gtIIdH1dNdJconBEedT67NDLK6ck"
 bot = telebot.TeleBot(TOKEN)
 
 def carregar_dados():
