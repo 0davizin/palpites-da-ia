@@ -50,18 +50,22 @@ def callback_inline(call):
     dados = carregar_dados()
     jogos = dados.get("jogos", [])
 
-    if call.data == "palpites_hoje":
+        if call.data == "palpites_hoje":
         if not jogos:
             bot.answer_callback_query(call.id, "Nenhum jogo cadastrado para hoje.")
             return
         
-        msg = "🔥 *PALPITES DE HOJE* 🔥\n\n"
+        msg = "🔥 *PALPITES E ANÁLISES DA IA* 🔥\n\n"
         for jogo in jogos:
+            msg += f"{jogo.get('pais', '🌍')} | *{jogo.get('campeonato', 'Liga')}*\n"
             msg += f"⚽ *{jogo.get('time_casa', 'Time A')} vs {jogo.get('time_fora', 'Time B')}*\n"
-            msg += f"🏆 *Palpite:* {jogo.get('palpite', 'N/A')}\n"
-            msg += f"📈 *Odd:* {jogo.get('odd', '1.00')}\n\n"
+            msg += f"📊 *Análise:* {jogo.get('estatisticas', 'Sem estatísticas.')}\n"
+            msg += f"🎯 *Palpite:* {jogo.get('palpite', 'N/A')}\n"
+            msg += f"📈 *Odd:* `{jogo.get('odd', '1.00')}`\n"
+            msg += "----------------------------------------\n\n"
         
         bot.send_message(call.message.chat.id, msg, parse_mode="Markdown")
+
 
     elif call.data == "estatisticas":
         bot.send_message(call.message.chat.id, "📊 *Estatísticas da IA*\n\nTaxa de assertividade atual: *78.5%*", parse_mode="Markdown")
