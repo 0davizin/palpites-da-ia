@@ -1,9 +1,26 @@
 import os
 import json
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-TOKEN = os.environ.get("8271721680", "8882509587:AAGtBR4gtIIdH1dNdJconBEedT67NDLK6ck")
+# Servidor web falso para o Render não reclamar de porta fechada
+class SimpleHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is alive!")
+
+def run_server():
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(("0.0.0.0", port), SimpleHandler)
+    server.serve_forever()
+
+# Inicia o servidor web em segundo plano
+threading.Thread(target=run_server, daemon=True).start()
+
+TOKEN = os.environ.get("8271721680", "8882509587:AAGtBR4gtIIdH1dNdJconBEedT67NDLK6ck)
 bot = telebot.TeleBot(TOKEN)
 
 def carregar_dados():
@@ -56,4 +73,3 @@ def callback_inline(call):
 
 if __name__ == "__main__":
     bot.infinity_polling()
-            
