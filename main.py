@@ -20,7 +20,7 @@ def run_server():
 # Inicia o servidor web em segundo plano
 threading.Thread(target=run_server, daemon=True).start()
 
-TOKEN = os.environ.get("8882509587:AAGtBR4gtIIdH1dNdJconBEedT67NDLK6ck")
+TOKEN = "8882509587:AAGtBR4gtIIdH1dNdJconBEedT67NDLK6ck"
 bot = telebot.TeleBot(TOKEN)
 
 def carregar_dados():
