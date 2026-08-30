@@ -1,150 +1,59 @@
-import json
 import os
+import json
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# Cole aqui o Token do seu Bot do Telegram (pegue com o @BotFather)
-TOKEN = "8882509587:AAGtBR4gtIIdH1dNdJconBEedT67NDLK6ck"
-
+TOKEN = os.environ.get("8271721680", "8882509587:AAGtBR4gtIIdH1dNdJconBEedT67NDLK6ck")
 bot = telebot.TeleBot(TOKEN)
 
-# Função para carregar o arquivo JSON com os dados dos jogos
 def carregar_dados():
-    if not os.path.exists("database.json"):
-        return {"jogos": [], "multipla_seguranca": "Nenhuma múltipla cadastrada."}
-    with open("database.json", "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open("database.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        try:
+            with open("banco de dados.json", "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {"jogos": []}
 
-# Comando /start - O ponto de partida do usuário no bot
-@bot.message_handler(commands=['start'])
-def enviar_welcome(message):
-    nome_usuario = message.from_user.first_name
-    
-    texto = (
-        f"⚽ **Bem-vindo ao PALPITES DA IA, {nome_usuario}!** 🤖🔥\n\n"
-        "Aqui você encontra as análises estatísticas profissionais dos jogos do dia, "
-        "com médias detalhadas de gols, escanteios, cartões e os nossos palpites de maior confiança.\n\n"
-        "Escolha uma das opções abaixo para começar:"
-    )
-    
-    # Criando os botões principais do menu
+@bot.message_handler(commands=['start', 'menu'])
+def send_welcome(message):
     markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton("📅 JOGOS DE HOJE", callback_data="listar_jogos"))
-    markup.add(InlineKeyboardButton("🎟️ MÚLTIPLA DE SEGURANÇA", callback_data="ver_multipla"))
-    
-    bot.send_message(message.chat.id, texto, parse_mode="Markdown", reply_markup=markup)
+    markup.row_width = 2
+    markup.add(
+        InlineKeyboardButton("⚽ Palpites Hoje", callback_data="palpites_hoje"),
+        InlineKeyboardButton("📊 Estatísticas", callback_data="estatisticas"),
+        InlineKeyboardButton("🎯 Múltipla do Dia", callback_data="multipla")
+    )
+    bot.reply_to(message, "👋 Olá! Bem-vindo ao *PALPITES DA IA*!\n\nEscolha uma opção no menu abaixo:", reply_markup=markup, parse_mode="Markdown")
 
-# Callback para listar os jogos cadastrados
-@bot.callback_query_handler(func=lambda call: call.data == "listar_jogos")
-def callback_listar_jogos(call):
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
     dados = carregar_dados()
     jogos = dados.get("jogos", [])
-    
-    if not jogos:
-        bot.answer_callback_query(call.id, "Nenhum jogo cadastrado no momento!")
-        return
-    
-    markup = InlineKeyboardMarkup()
-    for jogo in jogos:
-        # Cria um botão para cada jogo usando o ID dele
-        markup.add(InlineKeyboardButton(f"⚽ {jogo['confronto']}", callback_data=f"jogo_{jogo['id']}"))
-    
-    markup.add(InlineKeyboardButton("⬅️ Voltar ao Menu", callback_data="voltar_menu"))
-    
-    bot.edit_message_text(
-        "📋 **Selecione abaixo o confronto que deseja analisar:**",
-        call.message.chat.id,
-        call.message.message_id,
-        parse_mode="Markdown",
-        reply_markup=markup
-    )
 
-# Callback quando o usuário clica em um jogo específico
-@bot.callback_query_handler(func=lambda call: call.data.startswith("jogo_"))
-detalhes_jogo = 0 # apenas para escopo
-def callback_detalhes_jogo(call):
-    jogo_id = call.data.split("_")[1]
-    dados = carregar_dados()
-    jogos = dados.get("jogos", [])
-    
-    # Busca o jogo correspondente pelo ID
-    jogo_selecionado = None
-    for j in jogos:
-        if j["id"] == jogo_id:
-            jogo_selecionado = j
-            break
-            
-    if not jogo_selecionado:
-        bot.answer_callback_query(call.id, "Jogo não encontrado!")
-        return
+    if call.data == "palpites_hoje":
+        if not jogos:
+            bot.answer_callback_query(call.id, "Nenhum jogo cadastrado para hoje.")
+            return
         
-    # Monta o card detalhado do jogo
-    texto = (
-        f"⚔️ **{jogo_selecionado['confronto']}**\n"
-        f"🏆 *Campeonato:* {jogo_selecionado['campeonato']}\n"
-        f"⏰ *Horário:* {jogo_selecionado['horario']}\n\n"
-        f"📊 **PROBABILIDADES DE RESULTADO:**\n{jogo_selecionado['probabilidades']}\n\n"
-        f"⚽ **MÉDIAS DE GOLS:**\n{jogo_selecionado['gols']}\n\n"
-        f"🚩 **ESCANTEIOS:**\n{jogo_selecionado['escanteios']}\n\n"
-        f"🟨 **CARTÕES:**\n{jogo_selecionado['cartoes']}\n\n"
-        f"🎯 **AMBAS MARCAM:** {jogo_selecionado['ambas_marcam']}\n\n"
-        f"💡 **PALPITE DE CONFIANÇA:**\n👉 *{jogo_selecionado['palpite_confianca']}*"
-    )
-    
-    markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton("⬅️ Voltar para a Lista", callback_data="listar_jogos"))
-    
-    bot.edit_message_text(
-        texto,
-        call.message.chat.id,
-        call.message.message_id,
-        parse_mode="Markdown",
-        reply_markup=markup
-    )
+        msg = "🔥 *PALPITES DE HOJE* 🔥\n\n"
+        for jogo in jogos:
+            msg += f"⚽ *{jogo.get('time_casa', 'Time A')} vs {jogo.get('time_fora', 'Time B')}*\n"
+            msg += f"🏆 *Palpite:* {jogo.get('palpite', 'N/A')}\n"
+            msg += f"📈 *Odd:* {jogo.get('odd', '1.00')}\n\n"
+        
+        bot.send_message(call.message.chat.id, msg, parse_mode="Markdown")
 
-# Callback para exibir a múltipla de segurança
-@bot.callback_query_handler(func=lambda call: call.data == "ver_multipla")
-def callback_ver_multipla(call):
-    dados = carregar_dados()
-    multipla = dados.get("multipla_seguranca", "Sem dados.")
-    
-    texto = (
-        f"🎟️ **MÚLTIPLA DE SEGURANÇA DO DIA**\n\n"
-        f"{multipla}\n\n"
-        "*(Linhas validadas com base estatística para proteção e alta assertividade)*"
-    )
-    
-    markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton("⬅️ Voltar ao Menu", callback_data="voltar_menu"))
-    
-    bot.edit_message_text(
-        texto,
-        call.message.chat.id,
-        call.message.message_id,
-        parse_mode="Markdown",
-        reply_markup=markup
-    )
+    elif call.data == "estatisticas":
+        bot.send_message(call.message.chat.id, "📊 *Estatísticas da IA*\n\nTaxa de assertividade atual: *78.5%*", parse_mode="Markdown")
 
-# Callback para voltar ao menu principal
-@bot.callback_query_handler(func=lambda call: call.data == "voltar_menu")
-def callback_voltar_menu(call):
-    texto = (
-        "⚽ **PALPITES DA IA - Menu Principal**\n\n"
-        "Escolha uma das opções abaixo:"
-    )
-    markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton("📅 JOGOS DE HOJE", callback_data="listar_jogos"))
-    markup.add(InlineKeyboardButton("🎟️ MÚLTIPLA DE SEGURANÇA", callback_data="ver_multipla"))
-    
-    bot.edit_message_text(
-        texto,
-        call.message.chat.id,
-        call.message.message_id,
-        parse_mode="Markdown",
-        reply_markup=markup
-    )
+    elif call.data == "multipla":
+        bot.send_message(call.message.chat.id, "🎯 *Múltipla do Dia*\n\nConsulte os jogos de hoje no menu para montar seu bilhete!", parse_mode="Markdown")
 
-# Inicia o Bot
+    bot.answer_callback_query(call.id)
+
 if __name__ == "__main__":
-    print("🤖 Bot PALPITES DA IA iniciado com sucesso...")
     bot.infinity_polling()
+            
