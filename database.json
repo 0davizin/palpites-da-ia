@@ -1,31 +1,38 @@
 {
-  "jogos": [
+  "paises": [
     {
-      "pais": "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra",
-      "campeonato": "Premier League",
-      "time_casa": "Manchester United",
-      "time_fora": "Liverpool",
-      "estatisticas": "Média de 3.2 gols por jogo nos últimos confrontos. O Liverpool tem 70% de posse de bola fora de casa, enquanto o United cede muitos espaços pelos flancos.",
-      "palpite": "Ambas as equipes marcam (Sim)",
-      "odd": "1.72"
-    },
-    {
-      "pais": "🇪🇸 Espanha",
-      "campeonato": "La Liga",
-      "time_casa": "Real Madrid",
-      "time_fora": "Barcelona",
-      "estatisticas": "El Clásico tradicional. Real Madrid invicto como mandante na temporada com média de 2.5 gols marcados. Defesa do Barcelona sofreu gols em 80% das partidas fora.",
-      "palpite": "Vitória do Real Madrid",
-      "odd": "2.05"
-    },
-    {
-      "pais": "🇧🇷 Brasil",
+      "id": "brasil",
+      "pais_nome": "🇧🇷 Brasil",
       "campeonato": "Brasileirão Série A",
-      "time_casa": "Flamengo",
-      "time_fora": "Palmeiras",
-      "estatisticas": "Confronto direto pelo topo. O Flamengo finaliza em média 16 vezes por jogo no Maracanã. Palmeiras tem a defesa menos vazada como visitante.",
-      "palpite": "Menos de 2.5 gols",
-      "odd": "1.80"
+      "jogos": [
+        {
+          "id": "flamengo_botafogo",
+          "time_casa": "Flamengo",
+          "time_fora": "Botafogo",
+          "media_gols": "Flamengo: 2.1 | Botafogo: 1.4",
+          "media_escanteios": "Flamengo: 6.5 | Botafogo: 5.2",
+          "media_cartoes": "Flamengo: 2.3 | Botafogo: 2.8",
+          "entrada_ia": "Over 1.5 Gols Flamengo - 4/5 - 80%",
+          
+        }
+      ]
+    },
+    {
+      "id": "holanda",
+      "pais_nome": "🇳🇱 Holanda",
+      "campeonato": "Eredivisie",
+      "jogos": [
+        {
+          "id": "feyenoord_denhaag",
+          "time_casa": "Feyenoord",
+          "time_fora": "Den Haag",
+          "media_gols": "Feyenoord: 2.8 | Den Haag: 1.1",
+          "media_escanteios": "Feyenoord: 7.1 | Den Haag: 3.9",
+          "media_cartoes": "Feyenoord: 1.5 | Den Haag: 2.2",
+          "entrada_ia": "FEYENOORD VENCE E OVER 2.5 GOLS",
+        
+        }
+      ]
     }
   ]
 }
